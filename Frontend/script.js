@@ -6,6 +6,23 @@ const API = window.location.hostname === "localhost" || window.location.hostname
   ? "http://localhost:5000/api/tasks"
   : "https://task-manager-backend-ksiy.onrender.com/api/tasks"; 
 
+console.log("API Endpoint:", API);
+
+// Test backend connection
+async function testBackend() {
+  try {
+    const healthUrl = API.replace("/api/tasks", "/health");
+    const res = await fetch(healthUrl);
+    const data = await res.json();
+    console.log("Backend Status:", data);
+  } catch (err) {
+    console.error("Backend connection failed:", err);
+  }
+}
+
+// Call on page load
+testBackend(); 
+
 async function fetchTasks() {
   try {
     const res = await fetch(API);
@@ -55,15 +72,19 @@ async function addOrUpdateTask() {
   }
 
   const taskData = { title, description, status };
+  console.log("Sending task data:", taskData);
 
   try {
     // UPDATE
     if (editTaskId) {
+      console.log("Updating task:", editTaskId);
       const res = await fetch(`${API}/${editTaskId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData)
       });
+      const responseData = await res.json();
+      console.log("Update response:", responseData);
       if (!res.ok) throw new Error(`Failed to update: ${res.status}`);
 
       editTaskId = null;
@@ -71,19 +92,22 @@ async function addOrUpdateTask() {
     }
     // ADD
     else {
+      console.log("Adding new task");
       const res = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(taskData)
       });
+      const responseData = await res.json();
+      console.log("Add response:", responseData);
       if (!res.ok) throw new Error(`Failed to add: ${res.status}`);
     }
 
     clearForm();
-    fetchTasks();
+    await fetchTasks();
   } catch (err) {
     console.error("Error:", err);
-    alert("Error saving task. Check console for details.");
+    alert("Error saving task: " + err.message);
   }
 }
 
@@ -97,8 +121,16 @@ function startEdit(task) {
 }
 
 async function deleteTask(id) {
-  await fetch(`${API}/${id}`, { method: "DELETE" });
-  fetchTasks();
+  try {
+    console.log("Deleting task:", id);
+    const res = await fetch(`${API}/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error(`Failed to delete: ${res.status}`);
+    console.log("Task deleted successfully");
+    fetchTasks();
+  } catch (err) {
+    console.error("Delete error:", err);
+    alert("Error deleting task: " + err.message);
+  }
 }
 
 function clearForm() {

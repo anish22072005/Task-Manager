@@ -6,12 +6,14 @@ const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
-// Configure CORS to allow requests from Netlify
-app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:5000", "https://roaring-sundae-ba9cb1.netlify.app"],
-  credentials: true
-}));
+// Allow all origins for now - we'll restrict later
+app.use(cors());
 app.use(express.json());
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "Backend is working", time: new Date() });
+});
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Database connected"))
