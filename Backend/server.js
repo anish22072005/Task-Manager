@@ -10,6 +10,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({ message: "Task Manager Backend is running", apiDocs: "/health or /api/tasks" });
+});
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({ status: "Backend is working", time: new Date() });
