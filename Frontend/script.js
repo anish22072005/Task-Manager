@@ -1,14 +1,11 @@
 let allTasks = [];
 let editTaskId = null;
-
-// Use deployed backend URL or localhost for development
 const API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
   ? "http://localhost:5000/api/tasks"
   : "https://task-manager-backend-ksiy.onrender.com/api/tasks"; 
 
 console.log("API Endpoint:", API);
 
-// Test backend connection
 async function testBackend() {
   try {
     const healthUrl = API.replace("/api/tasks", "/health");
@@ -20,7 +17,6 @@ async function testBackend() {
   }
 }
 
-// Call on page load
 testBackend(); 
 
 async function fetchTasks() {
@@ -152,7 +148,6 @@ function setFilter(status, btn) {
   }
 }
 
-// Load tasks when page loads
 window.addEventListener("DOMContentLoaded", fetchTasks);
 
 function clearForm() {
