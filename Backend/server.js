@@ -6,15 +6,21 @@ const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
-app.use(cors());
+// Configure CORS to allow requests from Netlify
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:5000", "https://roaring-sundae-ba9cb1.netlify.app"],
+  credentials: true
+}));
 app.use(express.json());
 
-mongoose.connect("mongodb://127.0.0.1:27017/taskmanager")
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("Database connected"))
-  .catch(err => console.error(err));
+  .catch(err => console.error("Mongo error:", err));
 
 app.use("/api/tasks", taskRoutes);
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
