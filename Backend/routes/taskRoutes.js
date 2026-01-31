@@ -17,8 +17,13 @@ router.post("/", async (req, res) => {
 
 // READ
 router.get("/", async (req, res) => {
-  const tasks = await Task.find();
-  res.json(tasks);
+  try {
+    const tasks = await Task.find();
+    res.json(tasks);
+  } catch (err) {
+    console.error("GET error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // UPDATE
@@ -40,8 +45,13 @@ router.put("/:id", async (req, res) => {
 
 // DELETE
 router.delete("/:id", async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id);
-  res.json("Task deleted");
+  try {
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: "Task deleted" });
+  } catch (err) {
+    console.error("DELETE error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;
