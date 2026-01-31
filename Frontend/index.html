@@ -20,8 +20,14 @@
   </select>
 
   <button id="addBtn" onclick="addTask()">Add Task</button>
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('Pending', this)">Pending</button>
+  <button class="filter-btn" onclick="setFilter('In Progress', this)">In Progress</button>
+  <button class="filter-btn" onclick="setFilter('Completed', this)">Completed</button>
+</div>
 
-  <ul id="taskList"></ul>
+<ul id="taskList"></ul>
 </div>
 
 <script src="script.js"></script>

@@ -1,10 +1,13 @@
-const API = "http://localhost:5000/api/tasks";
+let allTasks = [];
 let editTaskId = null;
 
 async function fetchTasks() {
-  const res = await fetch(API);
-  const tasks = await res.json();
+  const res = await fetch("http://localhost:5000/api/tasks");
+  allTasks = await res.json();
+  renderTasks(allTasks);
+}
 
+function renderTasks(tasks) {
   const list = document.getElementById("taskList");
   list.innerHTML = "";
 
@@ -13,81 +16,46 @@ async function fetchTasks() {
 
     li.innerHTML = `
       <strong>${task.title}</strong>
-      <p>${task.description || ""}</p>
-
-      <div class="status ${task.status.replace(" ", "-")}">
-        ${task.status === "Pending" ? "⏳" : task.status === "In Progress" ? "🚧" : "✅"}
+      <p>${task.description}</p>
+      <span class="status ${task.status.replace(" ", "")}">
         ${task.status}
-      </div>
+      </span>
 
       <div class="task-actions">
-        <button class="edit-btn">Edit</button>
-        <button class="delete-btn">Delete</button>
+        <button class="edit-btn" onclick='editTask(${JSON.stringify(task)})'>Edit</button>
+        <button class="delete-btn" onclick="deleteTask('${task._id}')">Delete</button>
       </div>
     `;
-
-    li.querySelector(".edit-btn").addEventListener("click", () => {
-      editTask(task);
-    });
-
-    li.querySelector(".delete-btn").addEventListener("click", () => {
-      deleteTask(task._id);
-    });
 
     list.appendChild(li);
   });
 }
-async function addTask() {
-  const title = document.getElementById("title").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const status = document.getElementById("status").value;
 
-  if (!title) {
-    alert("Title is required");
-    return;
-  }
+function setFilter(status, btn) {
+  document.querySelectorAll(".filter-btn")
+    .forEach(b => b.classList.remove("active"));
 
-  const data = { title, description, status };
+  btn.classList.add("active");
 
-  if (editTaskId) {
-    await fetch(`${API}/${editTaskId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
-    editTaskId = null;
-    document.getElementById("addBtn").innerText = "Add Task";
+  if (status === "All") {
+    renderTasks(allTasks);
   } else {
-    await fetch(API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
+    renderTasks(allTasks.filter(task => task.status === status));
   }
+}
 
-  clearForm();
+async function deleteTask(id) {
+  await fetch(`http://localhost:5000/api/tasks/${id}`, { method: "DELETE" });
   fetchTasks();
 }
 
 function editTask(task) {
   document.getElementById("title").value = task.title;
-  document.getElementById("description").value = task.description || "";
+  document.getElementById("description").value = task.description;
   document.getElementById("status").value = task.status;
 
   editTaskId = task._id;
   document.getElementById("addBtn").innerText = "Update Task";
-}
-
-async function deleteTask(id) {
-  await fetch(`${API}/${id}`, { method: "DELETE" });
-  fetchTasks();
-}
-
-function clearForm() {
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("status").value = "Pending";
 }
 
 fetchTasks();
