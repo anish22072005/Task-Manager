@@ -1,48 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Task Manager</title>
+  <meta charset="UTF-8">
+  <title>Task Manager | Auth</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginContainer" class="container">
-  <h2 class="app-title">🔐 Login</h2>
+<div class="container">
+  <h2 class="app-title">🔐 Task Manager</h2>
+
   <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Password">
+
   <button onclick="login()">Login</button>
-  <p class="helper-text">Use any email & password (demo)</p>
+  <button class="secondary" onclick="register()">Register</button>
+
+  <p class="helper-text" id="msg"></p>
 </div>
 
-<!-- TASK MANAGER -->
-<div id="taskContainer" class="container" style="display:none;">
-  <h2 class="app-title">🗂️ Task Manager</h2>
-
-  <input id="title" placeholder="Title">
-  <input id="description" placeholder="Description">
-
-  <select id="status">
-    <option>Pending</option>
-    <option>In Progress</option>
-    <option>Completed</option>
-  </select>
-
-  <button id="addBtn">Add Task</button>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-
-  <div class="filter-bar">
-    <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
-    <button class="filter-btn" onclick="setFilter('Pending', this)">Pending</button>
-    <button class="filter-btn" onclick="setFilter('In Progress', this)">In Progress</button>
-    <button class="filter-btn" onclick="setFilter('Completed', this)">Completed</button>
-  </div>
-
-  <canvas id="progressChart"></canvas>
-  <ul id="taskList"></ul>
-</div>
-
-<script src="script.js"></script>
+<script src="auth.js"></script>
 </body>
 </html>

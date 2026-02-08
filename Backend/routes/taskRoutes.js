@@ -1,57 +1,34 @@
 const router = require("express").Router();
 const Task = require("../models/Task");
+const auth = require("../middleware/auth");
 
 // CREATE
-router.post("/", async (req, res) => {
-  try {
-    if (!req.body.title) {
-      return res.status(400).json({ error: "Title is required" });
-    }
-    const task = new Task(req.body);
-    await task.save();
-    res.json(task);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+router.post("/", auth, async (req, res) => {
+  const task = new Task({ ...req.body, user: req.user });
+  await task.save();
+  res.json(task);
 });
 
 // READ
-router.get("/", async (req, res) => {
-  try {
-    const tasks = await Task.find();
-    res.json(tasks);
-  } catch (err) {
-    console.error("GET error:", err);
-    res.status(500).json({ error: err.message });
-  }
+router.get("/", auth, async (req, res) => {
+  const tasks = await Task.find({ user: req.user });
+  res.json(tasks);
 });
 
 // UPDATE
-router.put("/:id", async (req, res) => {
-  try {
-    if (!req.body.title) {
-      return res.status(400).json({ error: "Title is required" });
-    }
-    const updatedTask = await Task.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    res.json(updatedTask);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
+router.put("/:id", auth, async (req, res) => {
+  const task = await Task.findOneAndUpdate(
+    { _id: req.params.id, user: req.user },
+    req.body,
+    { new: true }
+  );
+  res.json(task);
 });
 
 // DELETE
-router.delete("/:id", async (req, res) => {
-  try {
-    await Task.findByIdAndDelete(req.params.id);
-    res.json({ message: "Task deleted" });
-  } catch (err) {
-    console.error("DELETE error:", err);
-    res.status(500).json({ error: err.message });
-  }
+router.delete("/:id", auth, async (req, res) => {
+  await Task.findOneAndDelete({ _id: req.params.id, user: req.user });
+  res.json("Deleted");
 });
 
 module.exports = router;
