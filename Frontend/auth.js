@@ -5,14 +5,12 @@ const API_BASE =
 
 const msg = document.getElementById("msg");
 
-async function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+document.getElementById("loginBtn").onclick = login;
+document.getElementById("registerBtn").onclick = register;
 
-  if (!email || !password) {
-    msg.innerText = "Enter email & password";
-    return;
-  }
+async function login() {
+  const email = email.value.trim();
+  const password = password.value.trim();
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -22,27 +20,18 @@ async function login() {
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-      msg.innerText = data.message || "Login failed";
-      return;
-    }
+    if (!res.ok) return msg.innerText = data.message;
 
     localStorage.setItem("token", data.token);
     window.location.href = "index.html";
-  } catch (err) {
+  } catch {
     msg.innerText = "Server error";
   }
 }
 
 async function register() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-
-  if (!email || !password) {
-    msg.innerText = "Enter email & password";
-    return;
-  }
+  const email = email.value.trim();
+  const password = password.value.trim();
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/register`, {
@@ -52,14 +41,8 @@ async function register() {
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-      msg.innerText = data.message || "Registration failed";
-      return;
-    }
-
-    msg.innerText = "✅ Registered! Now login.";
-  } catch (err) {
+    msg.innerText = data.message;
+  } catch {
     msg.innerText = "Server error";
   }
 }

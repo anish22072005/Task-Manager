@@ -7,43 +7,25 @@ const authRoutes = require("./routes/authRoutes");
 
 const app = express();
 
-/* ---------- MIDDLEWARE ---------- */
 app.use(cors());
 app.use(express.json());
 
-/* ---------- ROUTES ---------- */
 app.get("/", (req, res) => {
-  res.json({
-    message: "Task Manager Backend is running",
-    routes: ["/api/auth", "/api/tasks", "/health"]
-  });
+  res.json({ message: "Task Manager Backend is running" });
 });
 
 app.get("/health", (req, res) => {
-  res.json({ status: "OK", time: new Date() });
+  res.json({ status: "OK" });
 });
 
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
 
-/* ---------- DB ---------- */
-const MONGO_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/taskmanager";
-
-mongoose
-  .connect(MONGO_URI)
+const MONGO_URI = process.env.MONGO_URI;
+mongoose.connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => {
-    console.error("❌ MongoDB error:", err.message);
-  });
+  .catch(err => console.error(err));
 
-/* ---------- ERROR HANDLER ---------- */
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ message: err.message });
-});
-
-/* ---------- START SERVER (LAST LINE) ---------- */
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
