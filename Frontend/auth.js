@@ -1,7 +1,11 @@
 // API Configuration
-const API_BASE = location.hostname === "localhost" || location.hostname === "127.0.0.1"
-  ? "http://localhost:5000"
-  : "https://task-manager-backend-ksiy.onrender.com";
+// For development: always use localhost
+const API_BASE = "http://localhost:5000";
+
+// For production deployment, uncomment this:
+// const API_BASE = location.hostname === "localhost" || location.hostname === "127.0.0.1"
+//   ? "http://localhost:5000"
+//   : "https://your-backend-url.onrender.com";
 
 const msg = document.getElementById("msg");
 const loginBtn = document.getElementById("loginBtn");
