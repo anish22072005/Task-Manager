@@ -13,6 +13,41 @@ function checkAuth() {
   }
 }
 
+// Dark Mode Toggle
+function toggleDarkMode() {
+  const body = document.body;
+  const container = document.querySelector(".container");
+  
+  body.classList.toggle("dark-mode");
+  if (container) container.classList.toggle("dark-mode");
+  
+  // Save preference
+  if (body.classList.contains("dark-mode")) {
+    localStorage.setItem("darkMode", "true");
+    updateThemeToggleButton();
+  } else {
+    localStorage.setItem("darkMode", "false");
+    updateThemeToggleButton();
+  }
+}
+
+function updateThemeToggleButton() {
+  const btn = document.querySelector(".theme-toggle");
+  if (btn) {
+    btn.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+  }
+}
+
+// Apply saved dark mode preference on load
+function applyDarkModePreference() {
+  const isDarkMode = localStorage.getItem("darkMode") === "true";
+  if (isDarkMode) {
+    document.body.classList.add("dark-mode");
+    document.querySelectorAll(".container").forEach(c => c.classList.add("dark-mode"));
+    updateThemeToggleButton();
+  }
+}
+
 let allTasks = [];
 let editTaskId = null;
 let progressChart = null;

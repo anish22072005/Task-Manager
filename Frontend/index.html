@@ -20,6 +20,7 @@
 <!-- Task Manager Container -->
 <div id="taskContainer" class="container" style="display: none;">
  <h2 class="app-title">🗂️ Task Manager</h2>
+  <button class="theme-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">🌙</button>
 
   <input id="title" placeholder="Title">
   <input id="description" placeholder="Description">
@@ -87,6 +88,7 @@
   }
   
   window.addEventListener("DOMContentLoaded", function() {
+    applyDarkModePreference();
     checkAuth();
     fetchTasks();
   });

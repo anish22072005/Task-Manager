@@ -12,6 +12,11 @@ body {
   justify-content: center;
   align-items: center;
   padding: 30px;
+  transition: background 0.3s ease;
+}
+
+body.dark-mode {
+  background: linear-gradient(135deg, #1f2937, #111827);
 }
 
 .container {
@@ -23,6 +28,11 @@ body {
   border-radius: 18px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
   animation: fadeIn 0.6s ease;
+}
+
+.container.dark-mode {
+  background: rgba(31, 41, 55, 0.92);
+  color: #f3f4f6;
 }
 
 @keyframes fadeIn {
@@ -41,6 +51,10 @@ h2 {
   font-weight: 700;
   margin-bottom: 22px;
   color: #0f172a;
+}
+
+body.dark-mode h2 {
+  color: #f3f4f6;
 }
 
 .app-title {
@@ -63,6 +77,13 @@ select {
   border: 1px solid #d1d5db;
   font-size: 14px;
   transition: all 0.2s ease;
+}
+
+body.dark-mode input,
+body.dark-mode select {
+  background: #374151;
+  color: #f3f4f6;
+  border-color: #4b5563;
 }
 
 input:focus,
@@ -101,6 +122,12 @@ li {
   margin-bottom: 16px;
   border: 1px solid #e5e7eb;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.dark-mode li {
+  background: #374151;
+  border-color: #4b5563;
+  color: #f3f4f6;
 }
 
 li:hover {
@@ -382,4 +409,83 @@ li p {
   font-size: 13px;
   color: #6b7280;
   margin-top: 10px;
+}
+
+body.dark-mode .helper-text {
+  color: #9ca3af;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+}
+
+body.dark-mode .theme-toggle {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+/* Dark mode adjustments */
+body.dark-mode li strong {
+  color: #f3f4f6;
+}
+
+body.dark-mode li p {
+  color: #d1d5db;
+}
+
+body.dark-mode .analytics div {
+  background: #374151;
+  color: #f3f4f6;
+}
+
+body.dark-mode .analytics h3 {
+  color: #60a5fa;
+}
+
+body.dark-mode .progress-section {
+  background: linear-gradient(135deg, #374151, #1f2937);
+  border-color: #4b5563;
+}
+
+body.dark-mode .progress-section h3 {
+  color: #e5e7eb;
+}
+
+body.dark-mode .stat-item {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+body.dark-mode .stat-label {
+  color: #d1d5db;
+}
+
+body.dark-mode .stat-value {
+  color: #60a5fa;
+}
+
+body.dark-mode .filter-btn {
+  background: #4b5563;
+  color: #e5e7eb;
+}
+
+body.dark-mode .filter-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
 }
