@@ -38,20 +38,27 @@ async function fetchTasks() {
 }
 
 /* RENDER TASKS */
-function renderTasks() {
+function renderTasks(taskArray) {
   taskList.innerHTML = "";
 
-  tasks.forEach(task => {
+  if (taskArray.length === 0) {
+    taskList.innerHTML = `<p>No tasks yet</p>`;
+    return;
+  }
+
+  taskArray.forEach(task => {
     const li = document.createElement("li");
     li.className = "task-card";
 
-    const statusClass = task.status.replace(/\s+/g, '-');
+    const statusClass = task.status.replace(/\s+/g, "-");
 
     li.innerHTML = `
       <strong>${escapeHtml(task.title)}</strong>
       <p>${escapeHtml(task.description || "No description")}</p>
 
-      <span class="status ${statusClass}">${task.status}</span>
+      <span class="status ${statusClass}">
+        ${task.status}
+      </span>
 
       <div class="task-actions">
         <button class="edit-btn" onclick="editTask('${task._id}')">
@@ -66,6 +73,7 @@ function renderTasks() {
     taskList.appendChild(li);
   });
 }
+
 
 
 /* 🔴 RENDER CHART */
@@ -144,3 +152,14 @@ function logout() {
   localStorage.removeItem("token");
   window.location.href = "index.html";
 }
+function escapeHtml(text = "") {
+  const map = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
