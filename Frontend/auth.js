@@ -1,26 +1,21 @@
 const API_BASE =
   location.hostname === "localhost"
-    ? "http://localhost:5000/api/auth"
-    : "https://task-manager-backend-ksiy.onrender.com/api/auth";
+    ? "http://localhost:5000"
+    : "https://task-manager-backend-ksiy.onrender.com";
 
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
 const msg = document.getElementById("msg");
-const loginBtn = document.getElementById("loginBtn");
-const registerBtn = document.getElementById("registerBtn");
 
-/* ---------- LOGIN ---------- */
 async function login() {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    msg.textContent = "❌ Email & password required";
+    msg.innerText = "Enter email & password";
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE}/login`, {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -29,35 +24,28 @@ async function login() {
     const data = await res.json();
 
     if (!res.ok) {
-      msg.textContent = "❌ " + data.message;
+      msg.innerText = data.message || "Login failed";
       return;
     }
 
     localStorage.setItem("token", data.token);
-    localStorage.setItem("userEmail", email);
-
-    msg.textContent = "✅ Login successful";
-    setTimeout(() => {
-      window.location.href = "tasks.html"; // or index.html (task page)
-    }, 800);
-
+    window.location.href = "index.html";
   } catch (err) {
-    msg.textContent = "❌ Server error";
+    msg.innerText = "Server error";
   }
 }
 
-/* ---------- REGISTER ---------- */
 async function register() {
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    msg.textContent = "❌ Email & password required";
+    msg.innerText = "Enter email & password";
     return;
   }
 
   try {
-    const res = await fetch(`${API_BASE}/register`, {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })
@@ -66,17 +54,12 @@ async function register() {
     const data = await res.json();
 
     if (!res.ok) {
-      msg.textContent = "❌ " + data.message;
+      msg.innerText = data.message || "Registration failed";
       return;
     }
 
-    msg.textContent = "✅ Registered! Now login.";
-
+    msg.innerText = "✅ Registered! Now login.";
   } catch (err) {
-    msg.textContent = "❌ Server error";
+    msg.innerText = "Server error";
   }
 }
-
-/* ---------- BUTTON EVENTS ---------- */
-loginBtn.addEventListener("click", login);
-registerBtn.addEventListener("click", register);
