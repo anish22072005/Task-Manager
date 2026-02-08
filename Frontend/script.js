@@ -1,6 +1,18 @@
-if (!localStorage.getItem("loggedIn")) {
-  window.location.href = "login.html";
+// Check if user is logged in
+function checkAuth() {
+  const isLoggedIn = localStorage.getItem("loggedIn");
+  const mainContent = document.getElementById("taskContainer");
+  const loginContent = document.getElementById("loginContainer");
+  
+  if (!isLoggedIn) {
+    if (mainContent) mainContent.style.display = "none";
+    if (loginContent) loginContent.style.display = "block";
+  } else {
+    if (mainContent) mainContent.style.display = "block";
+    if (loginContent) loginContent.style.display = "none";
+  }
 }
+
 let allTasks = [];
 let editTaskId = null;
 let progressChart = null;
@@ -238,5 +250,5 @@ fetchTasks();
 
 function logout() {
   localStorage.removeItem("loggedIn");
-  window.location.href = "login.html";
+  checkAuth();
 }

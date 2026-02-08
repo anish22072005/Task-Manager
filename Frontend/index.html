@@ -8,7 +8,17 @@
 </head>
 <body>
 
-<div class="container">
+<!-- Login Container -->
+<div id="loginContainer" class="container" style="display: none;">
+  <h2 class="app-title">🔐 Login</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <button id="loginBtn" onclick="login()" style="width: 100%; padding: 13px; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px;">Login</button>
+  <p class="helper-text">Create your email and password</p>
+</div>
+
+<!-- Task Manager Container -->
+<div id="taskContainer" class="container" style="display: block;">
  <h2 class="app-title">🗂️ Task Manager</h2>
 
   <input id="title" placeholder="Title">
@@ -64,5 +74,22 @@
 </div>
 
 <script src="script.js"></script>
+<script>
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    if (!email || !password) {
+      alert("Please enter email and password");
+      return;
+    }
+    localStorage.setItem("loggedIn", "true");
+    checkAuth();
+  }
+  
+  window.addEventListener("DOMContentLoaded", function() {
+    checkAuth();
+    fetchTasks();
+  });
+</script>
 </body>
 </html>
