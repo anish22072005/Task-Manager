@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Task Manager | Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -12,13 +13,23 @@
 
     <button class="logout-btn" onclick="logout()">Logout</button>
 
-    <input id="title" placeholder="Task title" />
-    <input id="description" placeholder="Description" />
+    <input 
+      id="title" 
+      placeholder="Task title" 
+      maxlength="100"
+      required 
+    />
+    
+    <input 
+      id="description" 
+      placeholder="Description (optional)" 
+      maxlength="500" 
+    />
 
     <select id="status">
-      <option>Pending</option>
-      <option>In Progress</option>
-      <option>Completed</option>
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Completed">Completed</option>
     </select>
 
     <button id="addBtn">Add Task</button>

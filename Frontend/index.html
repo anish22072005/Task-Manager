@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Task Manager | Auth</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Manager | Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -10,11 +11,29 @@
   <div class="container">
     <h2 class="app-title">🔐 Task Manager</h2>
 
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
+    <input 
+      type="email" 
+      id="email" 
+      placeholder="Email" 
+      autocomplete="email"
+      required 
+    />
+    
+    <input 
+      type="password" 
+      id="password" 
+      placeholder="Password" 
+      autocomplete="current-password"
+      required 
+    />
 
     <button id="loginBtn">Login</button>
-    <button id="registerBtn" class="secondary">Register</button>
+    <button 
+      id="registerBtn" 
+      style="background: linear-gradient(135deg, #10b981, #059669); margin-top: 10px;"
+    >
+      Register
+    </button>
 
     <p class="helper-text" id="msg"></p>
   </div>
