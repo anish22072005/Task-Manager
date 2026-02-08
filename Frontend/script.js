@@ -1,9 +1,12 @@
 let allTasks = [];
 let editTaskId = null;
+let progressChart = null;
+const API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "http://localhost:5000/api/tasks"
+  : "https://task-manager-backend-ksiy.onrender.com/api/tasks";
 
 // Use deployed backend URL or localhost for development
 const API_URL = "https://task-manager-backend-ksiy.onrender.com/api/tasks";
-
 
 console.log("API Endpoint:", API);
 
@@ -33,10 +36,64 @@ async function fetchTasks() {
     console.error("Error fetching tasks:", err);
   }
 }
+
 function updateAnalytics(){
-  document.getElementById("totalCount").innerText=allTasks.length;
-  document.getElementById("completedCount").innerText=allTasks.filter(t=>t.status !== "Completed").length;
-  document.getElementById("pendingCount").innerText=allTasks.filter(t=>t.status !== "Completed").length;
+  const total = allTasks.length;
+  const completed = allTasks.filter(t=>t.status === "Completed").length;
+  const pending = allTasks.filter(t=>t.status === "Pending").length;
+  const inProgress = allTasks.filter(t=>t.status === "In Progress").length;
+  
+  document.getElementById("totalCount").innerText = total;
+  document.getElementById("completedCount").innerText = completed;
+  document.getElementById("pendingCount").innerText = pending;
+  
+  // Calculate and update completion rate
+  const completionRate = total === 0 ? 0 : Math.round((completed / total) * 100);
+  document.getElementById("completionRate").innerText = completionRate + "%";
+  
+  // Update chart
+  updateProgressChart(completed, pending, inProgress);
+}
+
+function updateProgressChart(completed, pending, inProgress) {
+  const ctx = document.getElementById("progressChart");
+  
+  if (!ctx) return;
+  
+  const chartData = {
+    labels: ['Completed', 'Pending', 'In Progress'],
+    datasets: [{
+      data: [completed, pending, inProgress],
+      backgroundColor: ['#10b981', '#fbbf24', '#3b82f6'],
+      borderColor: ['#059669', '#d97706', '#1d4ed8'],
+      borderWidth: 2,
+      borderRadius: 8
+    }]
+  };
+  
+  if (progressChart) {
+    progressChart.data = chartData;
+    progressChart.update();
+  } else {
+    progressChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 15,
+              font: { size: 13, weight: '600' },
+              usePointStyle: true
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
 function renderTasks(tasks) {

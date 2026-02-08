@@ -272,6 +272,55 @@ li p {
   color: #475569;
 }
 
+.progress-section {
+  background: linear-gradient(135deg, #eef2ff, #f0f9ff);
+  padding: 16px;
+  border-radius: 14px;
+  margin: 20px 0;
+  border: 1px solid #e0e7ff;
+}
+
+.progress-section h3 {
+  font-size: 16px;
+  color: #1e293b;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.progress-container {
+  width: 100%;
+  height: 280px;
+  margin-bottom: 16px;
+}
+
+.progress-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 16px;
+  color: #4f46e5;
+  font-weight: 700;
+}
+
 /* Toast */
 .toast {
   position: fixed;

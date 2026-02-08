@@ -3,12 +3,12 @@
 <head>
   <title>Task Manager</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="container">
  <h2 class="app-title">🗂️ Task Manager</h2>
-
 
   <input id="title" placeholder="Title">
   <input id="description" placeholder="Description">
@@ -20,6 +20,7 @@
   </select>
 
   <button id="addBtn" onclick="addOrUpdateTask()">Add Task</button>
+  
   <div class="analytics">
     <div>
       <h3 id="totalCount">0</h3>
@@ -28,22 +29,36 @@
     <div>
       <h3 id="completedCount">0</h3>
       <p>Completed</p>
-      </div>
-      <div>
-        <h3 id="pendingCount">0</h3>
-        <p>Pending</p>
+    </div>
+    <div>
+      <h3 id="pendingCount">0</h3>
+      <p>Pending</p>
+    </div>
+  </div>
+
+  <div class="progress-section">
+    <h3>Progress Overview</h3>
+    <div class="progress-container">
+      <canvas id="progressChart"></canvas>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-item">
+        <span class="stat-label">Completion Rate:</span>
+        <span class="stat-value" id="completionRate">0%</span>
       </div>
     </div>
-    <div id="toast"></div>
   </div>
-<div class="filter-bar">
-  <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
-  <button class="filter-btn" onclick="setFilter('Pending', this)">Pending</button>
-  <button class="filter-btn" onclick="setFilter('In Progress', this)">In Progress</button>
-  <button class="filter-btn" onclick="setFilter('Completed', this)">Completed</button>
-</div>
 
-<ul id="taskList"></ul>
+  <div id="toast"></div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
+    <button class="filter-btn" onclick="setFilter('Pending', this)">Pending</button>
+    <button class="filter-btn" onclick="setFilter('In Progress', this)">In Progress</button>
+    <button class="filter-btn" onclick="setFilter('Completed', this)">Completed</button>
+  </div>
+
+  <ul id="taskList"></ul>
 </div>
 
 <script src="script.js"></script>
