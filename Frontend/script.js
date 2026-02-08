@@ -1,3 +1,6 @@
+if (!localStorage.getItem("loggedIn")) {
+  window.location.href = "login.html";
+}
 let allTasks = [];
 let editTaskId = null;
 let progressChart = null;
@@ -232,3 +235,8 @@ function clearForm() {
 
 document.getElementById("addBtn").onclick = addOrUpdateTask;
 fetchTasks();
+
+function logout() {
+  localStorage.removeItem("loggedIn");
+  window.location.href = "login.html";
+}
