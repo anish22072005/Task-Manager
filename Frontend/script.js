@@ -1,10 +1,10 @@
-/***********************
- AUTH (LOGIN / LOGOUT)
-************************/
+/* =======================
+   AUTH & THEME
+======================= */
 
 function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   if (!email || !password) {
     alert("Please enter email and password");
@@ -17,26 +17,23 @@ function login() {
 
 function logout() {
   localStorage.removeItem("loggedIn");
-  checkAuth();
+  location.reload();
 }
 
 function checkAuth() {
-  const isLoggedIn = localStorage.getItem("loggedIn");
+  const loggedIn = localStorage.getItem("loggedIn") === "true";
   const taskContainer = document.getElementById("taskContainer");
   const loginContainer = document.getElementById("loginContainer");
 
-  if (isLoggedIn === "true") {
-    if (taskContainer) taskContainer.style.display = "block";
-    if (loginContainer) loginContainer.style.display = "none";
-  } else {
-    if (taskContainer) taskContainer.style.display = "none";
-    if (loginContainer) loginContainer.style.display = "block";
+  if (taskContainer && loginContainer) {
+    taskContainer.style.display = loggedIn ? "block" : "none";
+    loginContainer.style.display = loggedIn ? "none" : "block";
   }
 }
 
-/***********************
- DARK MODE
-************************/
+/* =======================
+   DARK MODE
+======================= */
 
 function toggleDarkMode() {
   document.body.classList.toggle("dark-mode");
@@ -44,26 +41,17 @@ function toggleDarkMode() {
     "darkMode",
     document.body.classList.contains("dark-mode")
   );
-  updateThemeToggleButton();
 }
 
 function applyDarkModePreference() {
   if (localStorage.getItem("darkMode") === "true") {
     document.body.classList.add("dark-mode");
   }
-  updateThemeToggleButton();
 }
 
-function updateThemeToggleButton() {
-  const btn = document.querySelector(".theme-toggle");
-  if (btn) {
-    btn.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-  }
-}
-
-/***********************
- API CONFIG
-************************/
+/* =======================
+   API CONFIG
+======================= */
 
 const API =
   window.location.hostname === "localhost" ||
@@ -71,17 +59,17 @@ const API =
     ? "http://localhost:5000/api/tasks"
     : "https://task-manager-backend-ksiy.onrender.com/api/tasks";
 
-/***********************
- STATE
-************************/
+/* =======================
+   STATE
+======================= */
 
 let allTasks = [];
 let editTaskId = null;
 let progressChart = null;
 
-/***********************
- FETCH TASKS
-************************/
+/* =======================
+   FETCH TASKS
+======================= */
 
 async function fetchTasks() {
   try {
@@ -96,9 +84,60 @@ async function fetchTasks() {
   }
 }
 
-/***********************
- RENDER TASKS (IMPORTANT)
-************************/
+/* =======================
+   ANALYTICS + CHART
+======================= */
+
+function updateAnalytics() {
+  const total = allTasks.length;
+  const completed = allTasks.filter(t => t.status === "Completed").length;
+  const pending = allTasks.filter(t => t.status === "Pending").length;
+  const inProgress = allTasks.filter(t => t.status === "In Progress").length;
+
+  document.getElementById("totalCount").innerText = total;
+  document.getElementById("completedCount").innerText = completed;
+  document.getElementById("pendingCount").innerText = pending;
+
+  const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
+  document.getElementById("completionRate").innerText = rate + "%";
+
+  updateProgressChart(completed, pending, inProgress);
+}
+
+function updateProgressChart(completed, pending, inProgress) {
+  const canvas = document.getElementById("progressChart");
+  if (!canvas) return;
+
+  // IMPORTANT: destroy old chart (Netlify fix)
+  if (progressChart) {
+    progressChart.destroy();
+  }
+
+  progressChart = new Chart(canvas, {
+    type: "doughnut",
+    data: {
+      labels: ["Completed", "Pending", "In Progress"],
+      datasets: [{
+        data: [completed, pending, inProgress],
+        backgroundColor: ["#10b981", "#fbbf24", "#3b82f6"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "bottom"
+        }
+      }
+    }
+  });
+}
+
+/* =======================
+   RENDER TASKS
+======================= */
 
 function renderTasks(tasks) {
   const list = document.getElementById("taskList");
@@ -111,10 +150,7 @@ function renderTasks(tasks) {
     li.innerHTML = `
       <strong>${task.title}</strong>
       <p>${task.description || ""}</p>
-      <span class="status ${task.status.replace(" ", "-")}">
-        ${task.status}
-      </span>
-
+      <span class="status ${task.status.replace(" ", "-")}">${task.status}</span>
       <div class="task-actions">
         <button class="edit-btn">Edit</button>
         <button class="delete-btn">Delete</button>
@@ -128,9 +164,9 @@ function renderTasks(tasks) {
   });
 }
 
-/***********************
- ADD / UPDATE TASK
-************************/
+/* =======================
+   ADD / UPDATE
+======================= */
 
 async function addOrUpdateTask() {
   const title = document.getElementById("title").value.trim();
@@ -142,14 +178,14 @@ async function addOrUpdateTask() {
     return;
   }
 
-  const taskData = { title, description, status };
+  const payload = { title, description, status };
 
   try {
     if (editTaskId) {
       await fetch(`${API}/${editTaskId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData)
+        body: JSON.stringify(payload)
       });
       editTaskId = null;
       document.getElementById("addBtn").innerText = "Add Task";
@@ -157,7 +193,7 @@ async function addOrUpdateTask() {
       await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(taskData)
+        body: JSON.stringify(payload)
       });
     }
 
@@ -177,6 +213,10 @@ function startEdit(task) {
   document.getElementById("addBtn").innerText = "Update Task";
 }
 
+/* =======================
+   DELETE
+======================= */
+
 async function deleteTask(id) {
   try {
     await fetch(`${API}/${id}`, { method: "DELETE" });
@@ -186,86 +226,37 @@ async function deleteTask(id) {
   }
 }
 
+/* =======================
+   FILTER
+======================= */
+
+function setFilter(status, btn) {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  if (status === "All") renderTasks(allTasks);
+  else renderTasks(allTasks.filter(t => t.status === status));
+}
+
+/* =======================
+   UTIL
+======================= */
+
 function clearForm() {
   document.getElementById("title").value = "";
   document.getElementById("description").value = "";
   document.getElementById("status").value = "Pending";
 }
 
-/***********************
- FILTERS
-************************/
+/* =======================
+   INIT (CRITICAL)
+======================= */
 
-function setFilter(status, btn) {
-  document.querySelectorAll(".filter-btn").forEach(b =>
-    b.classList.remove("active")
-  );
-  btn.classList.add("active");
-
-  if (status === "All") {
-    renderTasks(allTasks);
-  } else {
-    renderTasks(allTasks.filter(t => t.status === status));
-  }
-}
-
-/***********************
- ANALYTICS + CHART
-************************/
-
-function updateAnalytics() {
-  const total = allTasks.length;
-  const completed = allTasks.filter(t => t.status === "Completed").length;
-  const pending = allTasks.filter(t => t.status === "Pending").length;
-  const inProgress = allTasks.filter(t => t.status === "In Progress").length;
-
-  document.getElementById("totalCount").innerText = total;
-  document.getElementById("completedCount").innerText = completed;
-  document.getElementById("pendingCount").innerText = pending;
-
-  const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
-  document.getElementById("completionRate").innerText = rate + "%";
-
-  updateProgressChart(completed, pending, inProgress);
-}
-
-function updateProgressChart(completed, pending, inProgress) {
-  const ctx = document.getElementById("progressChart");
-  if (!ctx) return;
-
-  const data = {
-    labels: ["Completed", "Pending", "In Progress"],
-    datasets: [
-      {
-        data: [completed, pending, inProgress],
-        backgroundColor: ["#10b981", "#fbbf24", "#3b82f6"]
-      }
-    ]
-  };
-
-  if (progressChart) {
-    progressChart.data = data;
-    progressChart.update();
-  } else {
-    progressChart = new Chart(ctx, {
-      type: "doughnut",
-      data,
-      options: {
-        responsive: true,
-        plugins: { legend: { position: "bottom" } }
-      }
-    });
-  }
-}
-
-/***********************
- INIT
-************************/
-
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   applyDarkModePreference();
   checkAuth();
-  fetchTasks();
-});
 
-document.getElementById("addBtn").onclick = addOrUpdateTask;
+  if (localStorage.getItem("loggedIn") === "true") {
+    await fetchTasks(); // chart renders AFTER data + auth
+  }
+});
