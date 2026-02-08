@@ -20,6 +20,22 @@
   </select>
 
   <button id="addBtn" onclick="addOrUpdateTask()">Add Task</button>
+  <div class="analytics">
+    <div>
+      <h3 id="totalCount">0</h3>
+      <p>Total</p>
+    </div>
+    <div>
+      <h3 id="completedCount">0</h3>
+      <p>Completed</p>
+      </div>
+      <div>
+        <h3 id="pendingCount">0</h3>
+        <p>Pending</p>
+      </div>
+    </div>
+    <div id="toast"></div>
+  </div>
 <div class="filter-bar">
   <button class="filter-btn active" onclick="setFilter('All', this)">All</button>
   <button class="filter-btn" onclick="setFilter('Pending', this)">Pending</button>

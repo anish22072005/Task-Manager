@@ -2,9 +2,8 @@ let allTasks = [];
 let editTaskId = null;
 
 // Use deployed backend URL or localhost for development
-const API = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "http://localhost:5000/api/tasks"
-  : "https://task-manager-backend-ksiy.onrender.com/api/tasks"; 
+const API_URL = "https://task-manager-backend-ksiy.onrender.com/api/tasks";
+
 
 console.log("API Endpoint:", API);
 
@@ -28,10 +27,16 @@ async function fetchTasks() {
     const res = await fetch(API);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     allTasks = await res.json();
+    updateAnalytics();
     renderTasks(allTasks);
   } catch (err) {
     console.error("Error fetching tasks:", err);
   }
+}
+function updateAnalytics(){
+  document.getElementById("totalCount").innerText=allTasks.length;
+  document.getElementById("completedCount").innerText=allTasks.filter(t=>t.status !== "Completed").length;
+  document.getElementById("pendingCount").innerText=allTasks.filter(t=>t.status !== "Completed").length;
 }
 
 function renderTasks(tasks) {
@@ -40,6 +45,7 @@ function renderTasks(tasks) {
 
   tasks.forEach(task => {
     const li = document.createElement("li");
+    li.classList.add("task-card");
 
     li.innerHTML = `
       <strong>${task.title}</strong>
