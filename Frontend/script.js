@@ -1,262 +1,144 @@
-/* =======================
-   AUTH & THEME
-======================= */
-
+/* ---------- AUTH ---------- */
 function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
   if (!email || !password) {
-    alert("Please enter email and password");
+    alert("Enter email & password");
     return;
   }
 
-  localStorage.setItem("loggedIn", "true");
+  localStorage.setItem("loggedIn", "true"); // ✅ lowercase
   checkAuth();
 }
 
 function logout() {
   localStorage.removeItem("loggedIn");
-  location.reload();
+  checkAuth();
 }
 
 function checkAuth() {
   const loggedIn = localStorage.getItem("loggedIn") === "true";
-  const taskContainer = document.getElementById("taskContainer");
-  const loginContainer = document.getElementById("loginContainer");
-
-  if (taskContainer && loginContainer) {
-    taskContainer.style.display = loggedIn ? "block" : "none";
-    loginContainer.style.display = loggedIn ? "none" : "block";
-  }
+  loginContainer.style.display = loggedIn ? "none" : "block";
+  taskContainer.style.display = loggedIn ? "block" : "none";
 }
 
-/* =======================
-   DARK MODE
-======================= */
-
-function toggleDarkMode() {
-  document.body.classList.toggle("dark-mode");
-  localStorage.setItem(
-    "darkMode",
-    document.body.classList.contains("dark-mode")
-  );
-}
-
-function applyDarkModePreference() {
-  if (localStorage.getItem("darkMode") === "true") {
-    document.body.classList.add("dark-mode");
-  }
-}
-
-/* =======================
-   API CONFIG
-======================= */
-
+/* ---------- API ---------- */
 const API =
-  window.location.hostname === "localhost" ||
-  window.location.hostname === "127.0.0.1"
+  location.hostname === "localhost"
     ? "http://localhost:5000/api/tasks"
     : "https://task-manager-backend-ksiy.onrender.com/api/tasks";
 
-/* =======================
-   STATE
-======================= */
-
+/* ---------- TASK LOGIC ---------- */
 let allTasks = [];
 let editTaskId = null;
-let progressChart = null;
-
-/* =======================
-   FETCH TASKS
-======================= */
+let chart = null;
 
 async function fetchTasks() {
-  try {
-    const res = await fetch(API);
-    if (!res.ok) throw new Error("Failed to fetch tasks");
-
-    allTasks = await res.json();
-    renderTasks(allTasks);
-    updateAnalytics();
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
+  const res = await fetch(API);
+  allTasks = await res.json();
+  renderTasks(allTasks);
+  updateChart();
 }
 
-/* =======================
-   ANALYTICS + CHART
-======================= */
+function renderTasks(tasks) {
+  taskList.innerHTML = "";
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <strong>${task.title}</strong>
+      <p>${task.description || ""}</p>
+      <small>${task.status}</small>
+      <button onclick="editTask('${task._id}')">Edit</button>
+      <button onclick="deleteTask('${task._id}')">Delete</button>
+    `;
+    taskList.appendChild(li);
+  });
+}
 
-function updateAnalytics() {
-  const total = allTasks.length;
+async function addOrUpdateTask() {
+  const data = {
+    title: title.value.trim(),
+    description: description.value.trim(),
+    status: status.value
+  };
+
+  if (!data.title) return alert("Title required");
+
+  const method = editTaskId ? "PUT" : "POST";
+  const url = editTaskId ? `${API}/${editTaskId}` : API;
+
+  await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  editTaskId = null;
+  addBtn.innerText = "Add Task";
+  clearForm();
+  fetchTasks();
+}
+
+function editTask(id) {
+  const task = allTasks.find(t => t._id === id);
+  title.value = task.title;
+  description.value = task.description || "";
+  status.value = task.status;
+  editTaskId = id;
+  addBtn.innerText = "Update Task";
+}
+
+async function deleteTask(id) {
+  await fetch(`${API}/${id}`, { method: "DELETE" });
+  fetchTasks();
+}
+
+function clearForm() {
+  title.value = "";
+  description.value = "";
+  status.value = "Pending";
+}
+
+function setFilter(type, btn) {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+
+  if (type === "All") renderTasks(allTasks);
+  else renderTasks(allTasks.filter(t => t.status === type));
+}
+
+/* ---------- CHART ---------- */
+function updateChart() {
   const completed = allTasks.filter(t => t.status === "Completed").length;
   const pending = allTasks.filter(t => t.status === "Pending").length;
-  const inProgress = allTasks.filter(t => t.status === "In Progress").length;
+  const progress = allTasks.filter(t => t.status === "In Progress").length;
 
-  document.getElementById("totalCount").innerText = total;
-  document.getElementById("completedCount").innerText = completed;
-  document.getElementById("pendingCount").innerText = pending;
+  if (chart) chart.destroy();
 
-  const rate = total === 0 ? 0 : Math.round((completed / total) * 100);
-  document.getElementById("completionRate").innerText = rate + "%";
-
-  updateProgressChart(completed, pending, inProgress);
-}
-
-function updateProgressChart(completed, pending, inProgress) {
-  const canvas = document.getElementById("progressChart");
-  if (!canvas) return;
-
-  // IMPORTANT: destroy old chart (Netlify fix)
-  if (progressChart) {
-    progressChart.destroy();
-  }
-
-  progressChart = new Chart(canvas, {
+  chart = new Chart(progressChart, {
     type: "doughnut",
     data: {
       labels: ["Completed", "Pending", "In Progress"],
       datasets: [{
-        data: [completed, pending, inProgress],
-        backgroundColor: ["#10b981", "#fbbf24", "#3b82f6"],
-        borderWidth: 0
+        data: [completed, pending, progress],
+        backgroundColor: ["#22c55e", "#facc15", "#3b82f6"]
       }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          position: "bottom"
-        }
-      }
     }
   });
 }
 
-/* =======================
-   RENDER TASKS
-======================= */
+/* ---------- INIT ---------- */
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginContainer = document.getElementById("loginContainer");
+const taskContainer = document.getElementById("taskContainer");
+const taskList = document.getElementById("taskList");
+const title = document.getElementById("title");
+const description = document.getElementById("description");
+const status = document.getElementById("status");
+const addBtn = document.getElementById("addBtn");
 
-function renderTasks(tasks) {
-  const list = document.getElementById("taskList");
-  list.innerHTML = "";
-
-  tasks.forEach(task => {
-    const li = document.createElement("li");
-    li.className = "task-card";
-
-    li.innerHTML = `
-      <strong>${task.title}</strong>
-      <p>${task.description || ""}</p>
-      <span class="status ${task.status.replace(" ", "-")}">${task.status}</span>
-      <div class="task-actions">
-        <button class="edit-btn">Edit</button>
-        <button class="delete-btn">Delete</button>
-      </div>
-    `;
-
-    li.querySelector(".edit-btn").onclick = () => startEdit(task);
-    li.querySelector(".delete-btn").onclick = () => deleteTask(task._id);
-
-    list.appendChild(li);
-  });
-}
-
-/* =======================
-   ADD / UPDATE
-======================= */
-
-async function addOrUpdateTask() {
-  const title = document.getElementById("title").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const status = document.getElementById("status").value;
-
-  if (!title) {
-    alert("Title is required");
-    return;
-  }
-
-  const payload = { title, description, status };
-
-  try {
-    if (editTaskId) {
-      await fetch(`${API}/${editTaskId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      editTaskId = null;
-      document.getElementById("addBtn").innerText = "Add Task";
-    } else {
-      await fetch(API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-    }
-
-    clearForm();
-    fetchTasks();
-  } catch (err) {
-    console.error("Save error:", err);
-  }
-}
-
-function startEdit(task) {
-  document.getElementById("title").value = task.title;
-  document.getElementById("description").value = task.description || "";
-  document.getElementById("status").value = task.status;
-
-  editTaskId = task._id;
-  document.getElementById("addBtn").innerText = "Update Task";
-}
-
-/* =======================
-   DELETE
-======================= */
-
-async function deleteTask(id) {
-  try {
-    await fetch(`${API}/${id}`, { method: "DELETE" });
-    fetchTasks();
-  } catch (err) {
-    console.error("Delete error:", err);
-  }
-}
-
-/* =======================
-   FILTER
-======================= */
-
-function setFilter(status, btn) {
-  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-
-  if (status === "All") renderTasks(allTasks);
-  else renderTasks(allTasks.filter(t => t.status === status));
-}
-
-/* =======================
-   UTIL
-======================= */
-
-function clearForm() {
-  document.getElementById("title").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("status").value = "Pending";
-}
-
-/* =======================
-   INIT (CRITICAL)
-======================= */
-
-window.addEventListener("DOMContentLoaded", async () => {
-  applyDarkModePreference();
-  checkAuth();
-
-  if (localStorage.getItem("loggedIn") === "true") {
-    await fetchTasks(); // chart renders AFTER data + auth
-  }
-});
+addBtn.onclick = addOrUpdateTask;
+checkAuth();
+fetchTasks();
