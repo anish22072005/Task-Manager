@@ -1,49 +1,31 @@
-const API_BASE =
-  location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://task-manager-backend-ksiy.onrender.com";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Task Manager | Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
 
-const msg = document.getElementById("msg");
+  <div class="container">
+    <h2 class="app-title">📋 My Tasks</h2>
 
-async function register() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+    <button class="logout-btn" onclick="logout()">Logout</button>
 
-  if (!email || !password) {
-    msg.innerText = "Email and password required";
-    return;
-  }
+    <input id="title" placeholder="Task title" />
+    <input id="description" placeholder="Description" />
 
-  const res = await fetch(`${API_BASE}/api/auth/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
+    <select id="status">
+      <option>Pending</option>
+      <option>In Progress</option>
+      <option>Completed</option>
+    </select>
 
-  const data = await res.json();
-  msg.innerText = data.message || "Registered!";
-}
+    <button id="addBtn">Add Task</button>
 
-async function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
+    <ul id="taskList"></ul>
+  </div>
 
-  const res = await fetch(`${API_BASE}/api/auth/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password })
-  });
-
-  const data = await res.json();
-
-  if (!res.ok) {
-    msg.innerText = data.message || "Login failed";
-    return;
-  }
-
-  // ✅ Save token
-  localStorage.setItem("token", data.token);
-
-  // Go to dashboard
-  window.location.href = "dashboard.html";
-}
+  <script src="script.js"></script>
+</body>
+</html>

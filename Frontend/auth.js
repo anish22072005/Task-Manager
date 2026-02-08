@@ -5,19 +5,15 @@ const API_BASE =
 
 const msg = document.getElementById("msg");
 
-// attach button handlers
 document.getElementById("loginBtn").addEventListener("click", login);
 document.getElementById("registerBtn").addEventListener("click", register);
 
 async function login() {
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    msg.innerText = "Enter email & password";
+    msg.innerText = "Email and password required";
     return;
   }
 
@@ -36,23 +32,19 @@ async function login() {
     }
 
     localStorage.setItem("token", data.token);
-    window.location.href = "index.html";
+    window.location.href = "dashboard.html";
 
   } catch (err) {
-    console.error(err);
     msg.innerText = "Server error";
   }
 }
 
 async function register() {
-  const emailInput = document.getElementById("email");
-  const passwordInput = document.getElementById("password");
-
-  const email = emailInput.value.trim();
-  const password = passwordInput.value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
-    msg.innerText = "Enter email & password";
+    msg.innerText = "Email and password required";
     return;
   }
 
@@ -73,7 +65,6 @@ async function register() {
     msg.innerText = "✅ Registered! Now login.";
 
   } catch (err) {
-    console.error(err);
     msg.innerText = "Server error";
   }
 }

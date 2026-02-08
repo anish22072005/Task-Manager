@@ -4,11 +4,7 @@ const API =
     : "https://task-manager-backend-ksiy.onrender.com/api/tasks";
 
 const token = localStorage.getItem("token");
-
-// 🔒 Redirect if not logged in
-if (!token) {
-  window.location.href = "index.html";
-}
+if (!token) window.location.href = "index.html";
 
 const taskList = document.getElementById("taskList");
 const title = document.getElementById("title");
@@ -18,11 +14,13 @@ const addBtn = document.getElementById("addBtn");
 
 let editId = null;
 
+addBtn.onclick = addOrUpdateTask;
+fetchTasks();
+
 async function fetchTasks() {
   const res = await fetch(API, {
     headers: { Authorization: `Bearer ${token}` }
   });
-
   const tasks = await res.json();
   renderTasks(tasks);
 }
@@ -90,6 +88,3 @@ function logout() {
   localStorage.removeItem("token");
   window.location.href = "index.html";
 }
-
-addBtn.onclick = addOrUpdateTask;
-fetchTasks();
