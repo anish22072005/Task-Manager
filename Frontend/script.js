@@ -43,18 +43,32 @@ async function fetchTasks() {
 
 function renderTasks(tasks) {
   taskList.innerHTML = "";
+
   tasks.forEach(task => {
     const li = document.createElement("li");
+    li.classList.add("task-card");
+
     li.innerHTML = `
       <strong>${task.title}</strong>
       <p>${task.description || ""}</p>
-      <small>${task.status}</small>
-      <button onclick="editTask('${task._id}')">Edit</button>
-      <button onclick="deleteTask('${task._id}')">Delete</button>
+
+      <span class="status ${task.status.replace(" ", "-")}">
+        ${task.status}
+      </span>
+
+      <div class="task-actions">
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
+      </div>
     `;
+
+    li.querySelector(".edit-btn").onclick = () => editTask(task._id);
+    li.querySelector(".delete-btn").onclick = () => deleteTask(task._id);
+
     taskList.appendChild(li);
   });
 }
+
 
 async function addOrUpdateTask() {
   const data = {
