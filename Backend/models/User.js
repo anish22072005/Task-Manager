@@ -10,4 +10,4 @@ const Userschema=new mongoose.Schema({
         required:true
     }
 });
-module.exports=mongoose.model('User',Userschema);
+module.exports=mongoose.model('user',Userschema);
