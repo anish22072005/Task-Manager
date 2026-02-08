@@ -330,3 +330,20 @@ body.dark-mode li p {
 .empty-state p:last-child {
   font-size: 14px;
 }
+
+.progress-section {
+  margin: 20px 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: #eef2ff;
+}
+
+.chart-container {
+  width: 100%;
+  height: 260px; /* REQUIRED */
+}
+
+#taskChart {
+  width: 100% !important;
+  height: 100% !important;
+}
