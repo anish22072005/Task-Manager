@@ -40,18 +40,33 @@ async function fetchTasks() {
 /* RENDER TASKS */
 function renderTasks() {
   taskList.innerHTML = "";
-  tasks.forEach(t => {
+
+  tasks.forEach(task => {
     const li = document.createElement("li");
+    li.className = "task-card";
+
+    const statusClass = task.status.replace(/\s+/g, '-');
+
     li.innerHTML = `
-      <strong>${t.title}</strong>
-      <p>${t.description || ""}</p>
-      <small>${t.status}</small>
-      <button onclick="editTask('${t._id}')">Edit</button>
-      <button onclick="deleteTask('${t._id}')">Delete</button>
+      <strong>${escapeHtml(task.title)}</strong>
+      <p>${escapeHtml(task.description || "No description")}</p>
+
+      <span class="status ${statusClass}">${task.status}</span>
+
+      <div class="task-actions">
+        <button class="edit-btn" onclick="editTask('${task._id}')">
+          Edit
+        </button>
+        <button class="delete-btn" onclick="deleteTask('${task._id}')">
+          Delete
+        </button>
+      </div>
     `;
+
     taskList.appendChild(li);
   });
 }
+
 
 /* 🔴 RENDER CHART */
 function renderChart() {
