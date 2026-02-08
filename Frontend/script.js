@@ -57,8 +57,12 @@ function updateAnalytics(){
 
 function updateProgressChart(completed, pending, inProgress) {
   const ctx = document.getElementById("progressChart");
+  console.log("Chart function called - ctx:", ctx, "completed:", completed, "pending:", pending, "inProgress:", inProgress);
   
-  if (!ctx) return;
+  if (!ctx) {
+    console.warn("progressChart canvas element not found");
+    return;
+  }
   
   const chartData = {
     labels: ['Completed', 'Pending', 'In Progress'],
@@ -74,6 +78,7 @@ function updateProgressChart(completed, pending, inProgress) {
   if (progressChart) {
     progressChart.data = chartData;
     progressChart.update();
+    console.log("Chart updated");
   } else {
     progressChart = new Chart(ctx, {
       type: 'doughnut',
@@ -93,6 +98,7 @@ function updateProgressChart(completed, pending, inProgress) {
         }
       }
     });
+    console.log("Chart created");
   }
 }
 
