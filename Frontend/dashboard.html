@@ -2,42 +2,38 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Task Manager | Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-  <div class="container">
-    <h2 class="app-title">📋 My Tasks</h2>
+<div class="container">
+  <h2 class="app-title">📋 My Tasks</h2>
 
-    <button class="logout-btn" onclick="logout()">Logout</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
 
-    <input id="title" placeholder="Task title" />
-    <input id="description" placeholder="Description" />
+  <input id="title" placeholder="Task title" />
+  <input id="description" placeholder="Description" />
 
-    <select id="status">
-      <option value="Pending">Pending</option>
-      <option value="In Progress">In Progress</option>
-      <option value="Completed">Completed</option>
-    </select>
+  <select id="status">
+    <option>Pending</option>
+    <option>In Progress</option>
+    <option>Completed</option>
+  </select>
 
-    <button id="addBtn">Add Task</button>
+  <button id="addBtn">Add Task</button>
 
-    <!-- 🔴 PROGRESS CHART -->
-    <div class="progress-section">
-      <h3>Task Progress</h3>
-      <div class="chart-container">
-        <canvas id="taskChart"></canvas>
-      </div>
-    </div>
+  <ul id="taskList"></ul>
 
-    <ul id="taskList"></ul>
-  </div>
+  <h3 style="margin-top:20px">Task Progress</h3>
+  <canvas id="taskChart"></canvas>
+</div>
 
-  <!-- 🔴 REQUIRED -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="script.js"></script>
-
+<script src="script.js"></script>
 </body>
 </html>

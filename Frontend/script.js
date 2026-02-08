@@ -10,108 +10,67 @@ if (!token) {
   window.location.href = "index.html";
 }
 
-/* DOM */
-const taskList = document.getElementById("taskList");
+// DOM
 const titleInput = document.getElementById("title");
 const descriptionInput = document.getElementById("description");
 const statusSelect = document.getElementById("status");
 const addBtn = document.getElementById("addBtn");
+const taskList = document.getElementById("taskList");
 
-let tasks = [];
+let chartInstance = null;
 let editId = null;
-let chart;
+let tasks = [];
 
-/* INIT */
-document.addEventListener("DOMContentLoaded", () => {
-  addBtn.onclick = addOrUpdateTask;
-  fetchTasks();
-});
+addBtn.onclick = saveTask;
+fetchTasks();
 
-/* FETCH TASKS */
+/* ---------------- TASKS ---------------- */
+
 async function fetchTasks() {
   const res = await fetch(API, {
     headers: { Authorization: `Bearer ${token}` }
   });
+
+  if (!res.ok) return logout();
+
   tasks = await res.json();
-  renderTasks();
-  renderChart();
+  renderTasks(tasks);
+  renderChart(tasks);
 }
 
-/* RENDER TASKS */
-function renderTasks(taskArray) {
+function renderTasks(list) {
   taskList.innerHTML = "";
 
-  if (taskArray.length === 0) {
-    taskList.innerHTML = `<p>No tasks yet</p>`;
-    return;
-  }
-
-  taskArray.forEach(task => {
+  list.forEach(task => {
     const li = document.createElement("li");
     li.className = "task-card";
 
-    const statusClass = task.status.replace(/\s+/g, "-");
-
     li.innerHTML = `
-      <strong>${escapeHtml(task.title)}</strong>
-      <p>${escapeHtml(task.description || "No description")}</p>
-
-      <span class="status ${statusClass}">
-        ${task.status}
-      </span>
+      <strong>${task.title}</strong>
+      <p>${task.description || ""}</p>
+      <span class="status ${task.status.replace(" ", "-")}">${task.status}</span>
 
       <div class="task-actions">
-        <button class="edit-btn" onclick="editTask('${task._id}')">
-          Edit
-        </button>
-        <button class="delete-btn" onclick="deleteTask('${task._id}')">
-          Delete
-        </button>
+        <button class="edit-btn">Edit</button>
+        <button class="delete-btn">Delete</button>
       </div>
     `;
+
+    li.querySelector(".edit-btn").onclick = () => editTask(task);
+    li.querySelector(".delete-btn").onclick = () => deleteTask(task._id);
 
     taskList.appendChild(li);
   });
 }
 
-
-
-/* 🔴 RENDER CHART */
-function renderChart() {
-  const completed = tasks.filter(t => t.status === "Completed").length;
-  const inProgress = tasks.filter(t => t.status === "In Progress").length;
-  const pending = tasks.filter(t => t.status === "Pending").length;
-
-  const ctx = document.getElementById("taskChart").getContext("2d");
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["Completed", "In Progress", "Pending"],
-      datasets: [{
-        data: [completed, inProgress, pending],
-        backgroundColor: ["#22c55e", "#3b82f6", "#f59e0b"]
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: "bottom" }
-      }
-    }
-  });
-}
-
-/* ADD / UPDATE */
-async function addOrUpdateTask() {
+async function saveTask() {
   const data = {
-    title: titleInput.value,
-    description: descriptionInput.value,
+    title: titleInput.value.trim(),
+    description: descriptionInput.value.trim(),
     status: statusSelect.value
   };
+
+  if (!data.title) return;
 
   const url = editId ? `${API}/${editId}` : API;
   const method = editId ? "PUT" : "POST";
@@ -126,40 +85,56 @@ async function addOrUpdateTask() {
   });
 
   editId = null;
+  titleInput.value = "";
+  descriptionInput.value = "";
+  statusSelect.value = "Pending";
+
   fetchTasks();
 }
 
-/* DELETE */
 async function deleteTask(id) {
   await fetch(`${API}/${id}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` }
   });
+
   fetchTasks();
 }
 
-/* EDIT */
-function editTask(id) {
-  const t = tasks.find(x => x._id === id);
-  titleInput.value = t.title;
-  descriptionInput.value = t.description;
-  statusSelect.value = t.status;
-  editId = id;
+function editTask(task) {
+  titleInput.value = task.title;
+  descriptionInput.value = task.description || "";
+  statusSelect.value = task.status;
+  editId = task._id;
 }
 
-/* LOGOUT */
 function logout() {
   localStorage.removeItem("token");
   window.location.href = "index.html";
 }
-function escapeHtml(text = "") {
-  const map = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  };
-  return text.replace(/[&<>"']/g, m => map[m]);
-}
 
+/* ---------------- CHART ---------------- */
+
+function renderChart(tasks) {
+  const counts = { Pending: 0, "In Progress": 0, Completed: 0 };
+
+  tasks.forEach(t => counts[t.status]++);
+
+  const ctx = document.getElementById("taskChart");
+
+  if (chartInstance) chartInstance.destroy();
+
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: Object.keys(counts),
+      datasets: [{
+        data: Object.values(counts),
+        backgroundColor: ["#f59e0b", "#3b82f6", "#10b981"]
+      }]
+    },
+    options: {
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+}
