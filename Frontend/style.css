@@ -247,10 +247,12 @@ li p {
 }
 
 .analytics {
-  display: flex;
+  display: flex !important;
   justify-content: space-between;
   gap: 12px;
   margin: 20px 0;
+  width: 100%;
+  visibility: visible !important;
 }
 
 .analytics div {
@@ -273,11 +275,15 @@ li p {
 }
 
 .progress-section {
+  display: block !important;
   background: linear-gradient(135deg, #eef2ff, #f0f9ff);
   padding: 16px;
   border-radius: 14px;
   margin: 20px 0;
   border: 1px solid #e0e7ff;
+  visibility: visible !important;
+  width: 100%;
+}
 }
 
 .progress-section h3 {
