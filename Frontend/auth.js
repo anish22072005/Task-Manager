@@ -5,12 +5,21 @@ const API_BASE =
 
 const msg = document.getElementById("msg");
 
-document.getElementById("loginBtn").onclick = login;
-document.getElementById("registerBtn").onclick = register;
+// attach button handlers
+document.getElementById("loginBtn").addEventListener("click", login);
+document.getElementById("registerBtn").addEventListener("click", register);
 
 async function login() {
-  const email = email.value.trim();
-  const password = password.value.trim();
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!email || !password) {
+    msg.innerText = "Enter email & password";
+    return;
+  }
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
@@ -20,18 +29,32 @@ async function login() {
     });
 
     const data = await res.json();
-    if (!res.ok) return msg.innerText = data.message;
+
+    if (!res.ok) {
+      msg.innerText = data.message || "Login failed";
+      return;
+    }
 
     localStorage.setItem("token", data.token);
     window.location.href = "index.html";
-  } catch {
+
+  } catch (err) {
+    console.error(err);
     msg.innerText = "Server error";
   }
 }
 
 async function register() {
-  const email = email.value.trim();
-  const password = password.value.trim();
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!email || !password) {
+    msg.innerText = "Enter email & password";
+    return;
+  }
 
   try {
     const res = await fetch(`${API_BASE}/api/auth/register`, {
@@ -41,8 +64,16 @@ async function register() {
     });
 
     const data = await res.json();
-    msg.innerText = data.message;
-  } catch {
+
+    if (!res.ok) {
+      msg.innerText = data.message || "Registration failed";
+      return;
+    }
+
+    msg.innerText = "✅ Registered! Now login.";
+
+  } catch (err) {
+    console.error(err);
     msg.innerText = "Server error";
   }
 }
