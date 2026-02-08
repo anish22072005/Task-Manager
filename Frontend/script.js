@@ -120,6 +120,7 @@ function renderChart(tasks) {
 
   tasks.forEach(t => counts[t.status]++);
 
+  const total = tasks.length || 1;
   const ctx = document.getElementById("taskChart");
 
   if (chartInstance) chartInstance.destroy();
@@ -134,7 +135,18 @@ function renderChart(tasks) {
       }]
     },
     options: {
-      plugins: { legend: { position: "bottom" } }
-    }
+      plugins: {
+        legend: { position: "bottom" },
+        datalabels: {
+          color: "#fff",
+          font: { weight: "bold" },
+          formatter: (value) => {
+            const percent = ((value / total) * 100).toFixed(0);
+            return percent + "%";
+          }
+        }
+      }
+    },
+    plugins: [ChartDataLabels]
   });
 }
