@@ -4,12 +4,16 @@ function checkAuth() {
   const mainContent = document.getElementById("taskContainer");
   const loginContent = document.getElementById("loginContainer");
   
-  if (!isLoggedIn) {
+  console.log("checkAuth - isLoggedIn:", isLoggedIn);
+  
+  if (!isLoggedIn || isLoggedIn === "false") {
     if (mainContent) mainContent.style.display = "none";
     if (loginContent) loginContent.style.display = "block";
+    console.log("Showing login page");
   } else {
     if (mainContent) mainContent.style.display = "block";
     if (loginContent) loginContent.style.display = "none";
+    console.log("Showing task manager");
   }
 }
 
